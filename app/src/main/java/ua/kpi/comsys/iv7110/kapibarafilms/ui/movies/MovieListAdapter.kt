@@ -2,14 +2,21 @@ package ua.kpi.comsys.iv7110.kapibarafilms.ui.movies
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.recyclerview.widget.RecyclerView
 import ua.kpi.comsys.iv7110.kapibarafilms.R
+import ua.kpi.comsys.iv7110.kapibarafilms.ui.getResId
 import java.util.*
 
-class MovieListAdapter(private val list: List<Movie>)
-    : RecyclerView.Adapter<MovieViewHolder>() {
+class MovieListAdapter(private var list: MutableList<Movie>,  private val clickListener: (Movie) -> Unit)
+    : RecyclerView.Adapter<MovieViewHolder>(), Filterable {
+
+    private val listFull: List<Movie> = list.toList()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return MovieViewHolder(inflater, parent)
@@ -18,13 +25,46 @@ class MovieListAdapter(private val list: List<Movie>)
     override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
         val movie: Movie = list[position]
         holder.bind(movie)
+        val deleteButton: AppCompatImageButton = holder.itemView.findViewById(R.id.deleteButton)
+        deleteButton.setOnClickListener {
+            list.removeAt(position)
+            notifyItemRemoved(position)
+            notifyItemRangeChanged(position, list.size)
+        }
+        holder.itemView.setOnClickListener { clickListener(movie) }
     }
 
     override fun getItemCount(): Int = list.size
+
+    override fun getFilter(): Filter {
+        return movieFilter
+    }
+
+    private val movieFilter: Filter = object : Filter() {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val results = FilterResults()
+
+            results.values = if (constraint == null || constraint.isEmpty()) {
+                listFull.toList()
+            } else {
+                val filterPattern = constraint.toString().toLowerCase(Locale.getDefault()).trim()
+                listFull.filter { it.Title.toLowerCase(Locale.getDefault()).trim().contains(filterPattern) }
+            }
+
+            return results
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            list = results?.values as MutableList<Movie>
+            notifyDataSetChanged()
+        }
+
+    }
 }
 
 class MovieViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
-    RecyclerView.ViewHolder(inflater.inflate(R.layout.list_item_movie, parent, false)) {
+    RecyclerView.ViewHolder(inflater.inflate(R.layout.list_item_movie, parent, false)){
 
     private var titleView: TextView? = null
     private var yearView: TextView? = null
@@ -46,15 +86,3 @@ class MovieViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     }
 }
 
-fun getResId(resName: String, c: Class<*>): Int {
-    val dotIndex = resName.indexOf(".")
-    val formattedName = if (dotIndex == -1) resName.toLowerCase(Locale.getDefault()) else resName.substring(0 until dotIndex)
-        .toLowerCase(Locale.getDefault())
-    return try {
-        val idField = c.getDeclaredField(formattedName)
-        idField.getInt(idField)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        -1
-    }
-}
