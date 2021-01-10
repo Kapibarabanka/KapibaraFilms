@@ -3,6 +3,7 @@ package ua.kpi.comsys.iv7110.kapibarafilms.ui
 import android.content.Context
 import android.util.Log
 import com.google.gson.Gson
+import ua.kpi.comsys.iv7110.kapibarafilms.ui.images.ImageSet
 import ua.kpi.comsys.iv7110.kapibarafilms.ui.movies.Movie
 import ua.kpi.comsys.iv7110.kapibarafilms.ui.movies.TAG
 import java.io.IOException
@@ -11,6 +12,7 @@ import java.io.InputStreamReader
 import java.util.*
 
 var allMovies = mutableListOf<Movie>()
+var allImages = mutableListOf<ImageSet>(ImageSet())
 
 fun <T> importFromJSON(context: Context, classT: Class<T>, fileId: Int): T? {
     var streamReader: InputStreamReader? = null

@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">KapibaraFilms</string>
-    <string name="title_home">Home</string>
+    <string name="title_images">Images</string>
     <string name="title_movies">Movies</string>
+    <string name="title_charts">Charts</string>
 
     <string name="Title">Title: %1$s</string>
     <string name="Year">Year: %1$s</string>
@@ -16,4 +17,6 @@
     <string name="Awards">Awards: %1$s</string>
     <string name="Rating">Rating: %1$s</string>
     <string name="Plot">Plot: %1$s</string>
+    <string name="graph">Graph</string>
+    <string name="diagram">Diagram</string>
 </resources>
